@@ -9,7 +9,10 @@ const SearchBar = () => {
       label="Search share accommodation"
       onOptionSelected={(suggestion) => {
         if (suggestion.value) {
-          dispatch(searchListingsByPlaceId(suggestion.value));
+          dispatch(searchListingsByPlaceId({
+            placeId: suggestion.value,
+            placeName: suggestion.label,
+          }));
         }
       }}
     />

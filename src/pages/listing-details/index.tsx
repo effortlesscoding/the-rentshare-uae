@@ -4,9 +4,9 @@ import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ImageGallery from '../../components/image-gallery';
 import { Air, Kitchen, Balcony, Bathroom, Bed, CalendarMonth, DoorBack, MonetizationOn, Receipt, Tv, Weekend, Close } from '@mui/icons-material';
-import { Avatar, Button, Chip, IconButton, TextField } from '@mui/material';
+import { Avatar, Button, Chip, CircularProgress, IconButton, TextField } from '@mui/material';
 import { RootState } from '../../state/store';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../../state/hooks';
 import { getListingByListingId, sendListingMessage } from '../../state/listings/slice';
 import RegistrationForm from '../../components/registration-form';
@@ -41,12 +41,14 @@ const ListingDetails = () => {
     const listingId = params['listingId'];
     const [messageSent, setMessageSent] = useState(false);
     const [message, setMessage] = useState('');
-    const listing = useSelector((state: RootState) => {
+    const listingData = useSelector((state: RootState) => {
         if (!listingId) {
             return null;
         }
         return state.listings.listings[listingId];
     });
+    console.log('debug::listingData::', listingData);
+
     const user = useSelector((state: RootState) => {
         return state.users.user
     });
@@ -62,21 +64,39 @@ const ListingDetails = () => {
             dispatch(sendListingMessage({
                 fromUserId: user.id,
                 message,
-                listingId: listing?.id ?? '--',
+                listingId: listingData?.data?.id ?? '--',
             }));
             setMessageSent(true);
         }
     };
 
+    const fetched = useRef(false);
     useEffect(() => {
-        if (!listingId) {
+        if (!listingId || fetched.current) {
             return;
         }
-        if (!listing) {
-            dispatch(getListingByListingId(listingId));
+        if (!listingData?.data && !fetched.current) {
+            fetched.current = true;
+            dispatch(getListingByListingId({ listingId }));
         }
-    }, [dispatch, listing, listingId])
+    }, [dispatch, listingData, listingId])
 
+    if (listingData?.state === 'loading') {
+        return (
+            <Grid container justifyContent="center">
+                <CircularProgress />
+            </Grid>
+        );
+    }
+
+    if (listingData?.state === 'error') {
+        return (
+            <Grid container justifyContent="center">
+                <p>Sorry, we could not retrieve the listing.</p>
+            </Grid>
+        );
+    }
+    const listing = listingData?.data;
     if (!listing) {
         return (
             <Grid container justifyContent="center">

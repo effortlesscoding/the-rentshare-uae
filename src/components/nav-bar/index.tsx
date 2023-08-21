@@ -1,9 +1,13 @@
-import { Button, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import SearchBar from "../search-bar";
 import styled from "@emotion/styled";
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useNavigate } from "react-router-dom";
 import Logo from "../logo";
+import {
+    Route,
+    Routes,
+} from "react-router-dom";
 
 const Root = styled.div`
     display: flex;
@@ -28,7 +32,9 @@ const NavBar = () => {
                 <Logo />
             </div>
             <div className="column" >
-                <SearchBar />
+                <Routes>
+                    <Route path="/" Component={SearchBar} />
+                </Routes>
             </div>
             <div className="column" >
                 <IconButton onClick={() => navigate('/auth')}>

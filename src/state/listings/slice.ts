@@ -2,31 +2,42 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { PropertyListingDetails } from "../../api/types";
 import * as ListingsApi from '../../api/listings';
 
+type ApiState = 'loading' | 'done' | 'error' | 'initial';
+
 // fine a type for the slice state
 interface ListingsState {
-  listings: Record<string, PropertyListingDetails>;
+  state: ApiState;
+  searchPlaceName: string | null;
+  listings: Record<string, {
+    data: PropertyListingDetails | null;
+    error?: string;
+    state: ApiState;
+  }>;
 }
 
 // Define the initial state using that type
 const initialState: ListingsState = {
+  state: 'initial',
+  searchPlaceName: null,
   listings: {},
 }
 
 export const searchListingsByPlaceId = createAsyncThunk(
     'listings/search',
-    async (placeId: string, thunkAPI): Promise<PropertyListingDetails[]> => {
-        const response = await ListingsApi.searchListingsId(placeId);
-        return response.data.map(listing => ({
-          ...listing.extraDetails,
-          id: listing.id,
-        }));
+    async (args: { placeId: string; placeName: string; }, thunkAPI): Promise<PropertyListingDetails[]> => {
+      const { placeId } = args;
+      const response = await ListingsApi.searchListingsId(placeId);
+      return response.data.map(listing => ({
+        ...listing.extraDetails,
+        id: listing.id,
+      }));
     }
 )
 
 export const getListingByListingId = createAsyncThunk(
   'listings/fetch',
-  async (listingId: string, thunkAPI): Promise<PropertyListingDetails> => {
-      const response = await ListingsApi.getListingById(listingId);
+  async (args: { listingId: string }, thunkAPI): Promise<PropertyListingDetails> => {
+      const response = await ListingsApi.getListingById(args.listingId);
       return {
         ...response.data.extraDetails,
         id: response.data.id,
@@ -53,21 +64,57 @@ export const listingsSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
       // Add reducers for additional action types here, and handle loading state as needed
+      builder.addCase(searchListingsByPlaceId.pending, (state, action) => {
+        console.log('debug::searchListingsByPlaceId::action::', action);
+        // Add a listing to the state array
+        state.state = 'loading';
+        state.searchPlaceName = action.meta.arg.placeName;
+        state.listings = {};
+      });
       builder.addCase(searchListingsByPlaceId.fulfilled, (state, action) => {
         // Add a listing to the state array
+        state.state = 'done';
         state.listings = {
           ...state.listings,
-          ...action.payload.reduce<Record<string, PropertyListingDetails>>((map, listing) => {
-            map[listing.id] = listing;
+          ...action.payload.reduce<ListingsState['listings']>((map, listing) => {
+            map[listing.id] = {
+              data: listing,
+              state: 'done',
+            };
             return map;
           }, {})
         };
+      });
+      builder.addCase(getListingByListingId.pending, (state, action) => {
+        console.log('debug::getListingById::', action);
+        state.listings = {
+          ...state.listings,
+          [action.meta.arg.listingId]: {
+            data: null,
+            state: 'loading',
+          },
+        };
+        console.log('debug::state.listings::', state.listings, action.payload);
       });
       builder.addCase(getListingByListingId.fulfilled, (state, action) => {
         // Add a listing to the state array
         state.listings = {
           ...state.listings,
-          [action.payload.id]: action.payload,
+          [action.payload.id]: {
+            data: action.payload,
+            state: 'done',
+          },
+        };
+        console.log('debug::state.listings::', state.listings, action.payload);
+      });
+      builder.addCase(getListingByListingId.rejected, (state, action) => {
+        // Add a listing to the state array
+        state.listings = {
+          ...state.listings,
+          [action.meta.arg.listingId]: {
+            data: null,
+            state: 'error',
+          },
         };
         console.log('debug::state.listings::', state.listings, action.payload);
       });
