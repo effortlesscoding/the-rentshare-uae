@@ -18,6 +18,7 @@ export interface PropertyListingDetails {
     features: {
         [key in Feature]: boolean;
     },
+    images: string[];
     specs: {
         price: number;
         cycle: 'weekly' | 'monthly' | 'annual';

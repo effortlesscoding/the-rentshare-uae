@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 // import { listings } from "../../state/listings";
 import { useSelector } from 'react-redux';
 import { RootState } from "../../state/store";
-import { Bathroom, Bed } from "@mui/icons-material";
+import { Bed, Bathtub } from "@mui/icons-material";
 import { CircularProgress } from "@mui/material";
 
 const Image = styled.div`
@@ -65,13 +65,18 @@ const Listings = () => {
                     }
                 }}
             >
-                <Image
-                    style={{
-                        backgroundImage: `url('https://mybayutcdn.bayut.com/mybayut/wp-content/uploads/Comparison-between-Arabian-Ranches-vs-Dubai-hills-estate-3rd-April-2020.png')`
-                    }}
-                />
-                <h2>{listing.address}</h2>
-                <p><Bathroom /> {listing.specs.bathrooms} <Bed /> {listing.specs.bedrooms}</p>
+                <div style={{ backgroundColor: '#ececec' }}>
+                    <Image
+                        style={{
+                            backgroundImage: `url('${listing.images[0]}')`,
+                            backgroundSize: 'contain',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat',
+                        }}
+                    />
+                </div>
+                <h2>AED {listing.specs.price} {listing.specs.cycle}</h2>
+                <div style={{ display: 'flex', alignItems: 'center' }}><Bathtub /> <span style={{ margin: '0 12px'}}>{listing.specs.bathrooms}</span> <Bed /> {listing.specs.bedrooms}</div>
                 <p>{listing.shortDescription}</p>
             </Grid>
         )

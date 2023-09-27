@@ -113,10 +113,12 @@ const ListingDetails = () => {
                     </Grid>
                     <Grid item container>
                         <ImageGallery
-                            imageURLs={[{
-                                original: 'https://mybayutcdn.bayut.com/mybayut/wp-content/uploads/Comparison-between-Arabian-Ranches-vs-Dubai-hills-estate-3rd-April-2020.png',
-                                thumbnail: 'https://mybayutcdn.bayut.com/mybayut/wp-content/uploads/Comparison-between-Arabian-Ranches-vs-Dubai-hills-estate-3rd-April-2020.png',
-                            }]}
+                            imageURLs={
+                                listing.images.map((img) => ({
+                                    original: img,
+                                    thumbnail: img,
+                                }))
+                            }
                         />
                     </Grid>
                     <Grid item container sm={8} sx={{ paddingRight: '2rem' }}>
