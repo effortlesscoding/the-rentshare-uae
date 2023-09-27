@@ -26,13 +26,14 @@ const GalleryStyles = styled.div`
 const ImageGallery = ({
     imageURLs,
 }: ImageGalleryProps) => {
+    const showPagination = imageURLs.length > 1;
     return (
         <GalleryStyles>
             <ReactImageGallery
                 items={imageURLs}
-                showBullets={imageURLs.length > 1}
-                showPlayButton={imageURLs.length > 1}
-                showThumbnails={imageURLs.length > 1}
+                showBullets={showPagination}
+                showPlayButton={showPagination}
+                showThumbnails={showPagination}
             />
         </GalleryStyles>
     );
