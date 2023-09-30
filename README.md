@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# Project
 
 This is the frontend for the rent sharing website for UAE residents. Under active development.
 
