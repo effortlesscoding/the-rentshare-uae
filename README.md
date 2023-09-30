@@ -6,7 +6,7 @@ The website allows you to sign up and find properties where you can share a room
 
 At the same time, it also allows you to advertise your own roomsharing listings. You can add descriptions, name your price, etc.
 
-# Tech stack
+## Tech stack
 
 Frontend is in react.js + redux-toolkit. 
 
