@@ -18,16 +18,16 @@ const Container = styled.div`
 
 function App() {
   return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <Root>
-          <NavBar />
-          <Container>
-            <PageRoutes />
-          </Container>
-        </Root>
-      </BrowserRouter>
-    </Provider>
+    <BrowserRouter>
+      <Provider store={store}>
+          <Root>
+            <NavBar />
+            <Container>
+              <PageRoutes />
+            </Container>
+          </Root>
+      </Provider>
+    </BrowserRouter>
   );
 }
 

@@ -99,7 +99,7 @@ const AutocompleteGmaps = ({
                 label={label}
             />
           )}
-          value={selectedOption?.value}
+          value={selectedOption?.label ?? null}
         />
     );
 };
