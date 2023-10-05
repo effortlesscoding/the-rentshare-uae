@@ -24,13 +24,17 @@ const initialState: ListingsState = {
 
 export const searchListingsByPlaceId = createAsyncThunk(
     'listings/search',
-    async (args: { placeId: string; placeName: string; }, thunkAPI): Promise<PropertyListingDetails[]> => {
+    async (args: { placeId: string; placeName: string; }, thunkAPI) => {
       const { placeId } = args;
-      const response = await ListingsApi.searchListingsId(placeId);
-      return response.data.map(listing => ({
-        ...listing.extraDetails,
-        id: listing.id,
-      }));
+      try {
+        const response = await ListingsApi.searchListings(placeId);
+        return response.data.map(listing => ({
+          ...listing.extraDetails,
+          id: listing.id,
+        }));
+      } catch (err) {
+        return thunkAPI.rejectWithValue([]);
+      }
     }
 )
 
@@ -84,6 +88,11 @@ export const listingsSlice = createSlice({
             return map;
           }, {})
         };
+      });
+      builder.addCase(searchListingsByPlaceId.rejected, (state, action) => {
+        // Add a listing to the state array
+        state.state = 'error';
+        state.listings = {};
       });
       builder.addCase(getListingByListingId.pending, (state, action) => {
         console.log('debug::getListingById::', action);

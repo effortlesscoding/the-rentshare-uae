@@ -3,7 +3,7 @@ import { config } from './config';
 
 const BASE_URL = config.apiHost;
 
-export const searchListingsId = (placeId: string): Promise<{
+export const searchListings = (placeId: string): Promise<{
     data: Array<{
         id: string;
         extraDetails: PropertyListingDetails;

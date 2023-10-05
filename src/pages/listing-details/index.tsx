@@ -3,14 +3,31 @@ import Dialog from '@mui/material/Dialog';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ImageGallery from '../../components/image-gallery';
-import { Air, Kitchen, Balcony, Bathroom, Bed, CalendarMonth, DoorBack, MonetizationOn, Receipt, Tv, Weekend, Close } from '@mui/icons-material';
+import {
+    Air,
+    Kitchen,
+    Balcony,
+    Bed,
+    CalendarMonth,
+    DoorBack,
+    MonetizationOn,
+    Receipt,
+    Tv,
+    Weekend,
+    Close,
+    Lock,
+    Countertops,
+    EmojiObjects,
+    Checkroom,
+    Bathtub
+} from '@mui/icons-material';
 import { Avatar, Button, Chip, CircularProgress, IconButton, TextField } from '@mui/material';
 import { RootState } from '../../state/store';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../../state/hooks';
 import { getListingByListingId, sendListingMessage } from '../../state/listings/slice';
-import RegistrationForm from '../../components/registration-form';
 import Authentication from '../authentication';
+import { Feature } from '../../api/types';
 interface ListingFeatureProps {
     icon: JSX.Element;
     label: string;
@@ -33,6 +50,55 @@ const ListingFeature = ({
             </Grid>
         </Grid>
     )
+}
+
+const roomType = (type: 'privateRoom' | 'sharedRoom') => {
+    if (type === 'privateRoom') {
+        return 'Private room';
+    }
+    if (type === 'sharedRoom') {
+        return 'Shared room';
+    }
+    return 'Room';
+}
+
+const featureToComponent: Record<Feature, JSX.Element> = {
+    'aircon': <ListingFeature
+        icon={<Air />}
+        label="Air conditioner"
+    />,
+    'tv':  <ListingFeature
+        icon={<Tv />}
+        label="TV"
+    />,
+    'balcony':  <ListingFeature
+        icon={<Balcony />}
+        label="Balcony"
+    />,
+    'couch' :  <ListingFeature
+        icon={<Weekend />}
+        label="Couch"
+    />,
+    'doorLock': <ListingFeature
+        icon={<Lock />}
+        label="Smart lock"
+    />,
+    'fridge':  <ListingFeature
+        icon={<Kitchen />}
+        label="Fridge"
+    />,
+    'kitchenette': <ListingFeature
+        icon={<Countertops />}
+        label="Kitchenette"
+    />,
+    'lamp':  <ListingFeature
+        icon={<EmojiObjects />}
+        label="Kitchenette"
+    />,
+    'wardrobe': <ListingFeature
+        icon={<Checkroom />}
+        label="Wardrobe"
+    />,
 }
 
 const ListingDetails = () => {
@@ -98,12 +164,26 @@ const ListingDetails = () => {
     }
     const listing = listingData?.data;
     if (!listing) {
+        if (listingData?.state === 'initial') {
+            return null;
+        }
         return (
             <Grid container justifyContent="center">
                 <h1>Sorry, we could not find the listing</h1>
             </Grid>
         );
     }
+
+    const featureComponents = Object.entries(listing.features).reduce<JSX.Element[]>((components, [feature, available]) => {
+        const featureComponent = featureToComponent[feature as Feature];
+        if (available && featureComponent) {
+            components.push(featureComponent);
+        }
+        return components;
+    }, []);
+
+    const featureComponentsPerColumn = Math.min(featureComponents.length, Math.ceil(9 / 2));
+
     return (
         <>
             <Grid container justifyContent="center">
@@ -124,7 +204,10 @@ const ListingDetails = () => {
                     <Grid item container sm={8} sx={{ paddingRight: '2rem' }}>
                         <Grid item xs={10} sm={8}>
                             <h2>{listing.address}</h2>
-                            <p><Bathroom /> {listing.specs.bathrooms} <Bed /> {listing.specs.bedrooms}</p>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Bathtub /> <span style={{ margin: '0 12px'}}>{listing.specs.bathrooms}</span>
+                                <Bed /> {listing.specs.bedrooms}
+                            </div>
                         </Grid>
                         <Grid item xs={10} sm={8}>
                             <p>{listing.shortDescription}</p>
@@ -139,60 +222,42 @@ const ListingDetails = () => {
                                     />
                                     <ListingFeature
                                         icon={<DoorBack />}
-                                        label={listing.type}
+                                        label={roomType(listing.type)}
                                     />
                                     <ListingFeature
                                         icon={<CalendarMonth />}
-                                        label={'Min 6 days'}
+                                        label={'Min 6 months'}
                                     />
                                     <ListingFeature
                                         icon={<Bed />}
-                                        label={'Furnished'}
+                                        label={listing.specs.furnishing === 'unfurnished' ? 'Unfurnished' : 'Furnished'}
                                     />
                                 </Grid>
                                 <Grid item xs={6}>
                                     <ListingFeature
                                         icon={<Receipt />}
-                                        label={'DEWA included'}
+                                        label={listing.specs.bills === 'billsIncluded' ? 'DEWA included' : 'DEWA not included'}
                                     />
                                     <ListingFeature
                                         icon={<DoorBack />}
                                         label={listing.specs.bedrooms + ' bedrooms'}
-                                    />
-                                    <ListingFeature
-                                        icon={<CalendarMonth />}
-                                        label={'Parking included'}
                                     />
                                 </Grid>
                             </Grid>
                             <h2>Features</h2>
                             <Grid container>
                                 <Grid item xs={6}>
-                                    <ListingFeature
-                                        icon={<Tv />}
-                                        label="TV"
-                                    />
-                                    <ListingFeature
-                                        icon={<Weekend />}
-                                        label="Couch"
-                                    />
-                                    <ListingFeature
-                                        icon={<Balcony />}
-                                        label="Balcony"
-                                    />
+                                    {featureComponents
+                                        .slice(0, featureComponentsPerColumn)
+                                        .map(component => component)}
                                 </Grid>
                                 <Grid item xs={6}>
-                                    <ListingFeature
-                                        icon={<Air />}
-                                        label="Air conditioner"
-                                    />
-                                    <ListingFeature
-                                        icon={<Kitchen />}
-                                        label="Kitchenette"
-                                    />
+                                    {featureComponents
+                                        .slice(featureComponentsPerColumn, featureComponents.length)
+                                        .map(component => component)}
                                 </Grid>
                             </Grid>
-                            <h2>About the flatmates</h2>
+                            {/* <h2>About the flatmates</h2>
                             <p>
                                 I’m Alex, a 33 year old risk consulting professional working in the city, work in the city 2-3 days a week and 2 days WFH. Love hiking and seeing friends for brunch and outings on the weekends.
                             </p>
@@ -201,7 +266,7 @@ const ListingDetails = () => {
                             </p>
                             <p>
                                 I’m neat and tidy and would prefer people who are the same, personal / share space hygiene is big for me.
-                            </p>
+                            </p> */}
                         </Grid>
                     </Grid>
                     <Grid item container sm={4}>
@@ -222,9 +287,9 @@ const ListingDetails = () => {
                                         <Avatar />
                                     </Grid>
                                     <Grid item sx={{ '& p': { margin: 0 }, '& h3': { margin: '0 1rem 0 0' }}}>
-                                        <h3>Message Alex</h3>
-                                        <p>Online today</p>
-                                        <Chip label="Response rate 93%" />
+                                        <h3>Message {listing.host?.name ?? 'the host'}</h3>
+                                        <p>Online {listing.host?.lastOnline ?? 'recently'}</p>
+                                        {listing.host?.responseRate > 0.5 ? <Chip label={`Response rate ${listing.host.responseRate * 100}%`} /> : null}
                                     </Grid>
                                 </Grid>
                                 <TextField

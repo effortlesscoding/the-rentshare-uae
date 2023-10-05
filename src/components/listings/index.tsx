@@ -18,7 +18,7 @@ const Listings = () => {
     const listingsState = useSelector((state: RootState) => state.listings);
     const listingsData = useSelector((state: RootState) => Object.values(state.listings.listings));
 
-    console.log('debug::listingsData::', listingsData);
+    console.log('debug::listingsData::', listingsData, listingsState);
     if (listingsState.state === 'initial') {
         return (
             <h1>Type in the neighbourhood you want to find a shared accommodation in.</h1>
@@ -27,8 +27,8 @@ const Listings = () => {
 
     if (listingsState.state === 'loading') {
         return (
-            <Grid container>
-                <CircularProgress /><span>Searching in {listingsState.searchPlaceName}</span>
+            <Grid container direction="column" alignItems="center" justifyContent="center" sx={{ padding: '2rem' }}>
+                <CircularProgress /><span style={{ marginTop: '1rem' }}>Searching in {listingsState.searchPlaceName}</span>
             </Grid>
         );
     }
