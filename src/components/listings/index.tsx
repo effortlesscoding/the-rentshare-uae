@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 // import { listings } from "../../state/listings";
 import { useSelector } from 'react-redux';
 import { RootState } from "../../state/store";
-import { Bed, Bathtub } from "@mui/icons-material";
+import { Bed, Bathtub, Home } from "@mui/icons-material";
 import { CircularProgress } from "@mui/material";
 
 const Image = styled.div`
@@ -18,10 +18,14 @@ const Listings = () => {
     const listingsState = useSelector((state: RootState) => state.listings);
     const listingsData = useSelector((state: RootState) => Object.values(state.listings.listings));
 
-    console.log('debug::listingsData::', listingsData, listingsState);
     if (listingsState.state === 'initial') {
         return (
-            <h1>Type in the neighbourhood you want to find a shared accommodation in.</h1>
+            <Grid container direction="column" sx={{ maxWidth: '600px', margin: '0 auto' }}>
+                <h1><Home /> Welcome to therentshare.com!</h1>
+
+                <p>This website is dedicated to helping residents in Dubai find and advertise affordable shared accommodations</p>
+                <p>To start, type in the address you want to find a shared accommodation in. The searchbox is at the top of the page.</p>
+            </Grid>
         );
     }
 

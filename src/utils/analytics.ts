@@ -6,6 +6,11 @@ type EventProperties = {
     },
     'pageview': {
         page: string;
+    },
+    'ui_event': {
+        action: string;
+        subject: string;
+        extra: string;
     }
 }
 

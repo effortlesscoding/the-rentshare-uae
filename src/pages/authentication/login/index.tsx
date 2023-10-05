@@ -4,6 +4,8 @@ import Button from "@mui/material/Button";
 import { FormEvent, useState } from "react";
 import { useAppDispatch } from "../../../state/hooks";
 import { loginUser } from "../../../state/users/slice";
+import { trackEvent } from "../../../utils/analytics";
+import { useOnMount } from "../../../utils/useOnMount";
 
 interface FormProps {
     email: string;
@@ -26,22 +28,43 @@ const Login = ({ onLoggedIn }: Props) => {
         evt.preventDefault();
         evt.stopPropagation();
         try {
-            console.log('debug::submitting!');
+            trackEvent('ui_event', {
+                action: 'started',
+                subject: 'login',
+                extra: formValues.email,
+            });
             const response = await dispatch(loginUser({
                 email: formValues.email,
                 password: formValues.password,
             }));
             const payload = response.payload as any;
-            console.log('debug::submitting!', { payload });
             if (payload.user) {
+                trackEvent('ui_event', {
+                    action: 'succeeded',
+                    subject: 'login',
+                    extra: `userid_${payload.user.id}`,
+                });
                 onLoggedIn();
             } else if (payload.error) {
+                trackEvent('ui_event', {
+                    action: 'failed',
+                    subject: 'login',
+                    extra: `status_${payload.status}`,
+                });
                 alert(`${payload.error} with status ${payload.status}`)
             }
         } catch (e) {
             alert((e as any).message);
         }
     };
+
+    useOnMount(() => {
+        trackEvent('ui_event', {
+            action: 'viewed',
+            subject: 'login',
+            extra: '',
+        });
+    });
 
     return (
         <Grid

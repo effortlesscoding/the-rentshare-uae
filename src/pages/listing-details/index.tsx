@@ -28,6 +28,7 @@ import { useAppDispatch } from '../../state/hooks';
 import { getListingByListingId, sendListingMessage } from '../../state/listings/slice';
 import Authentication from '../authentication';
 import { Feature } from '../../api/types';
+import { trackEvent } from '../../utils/analytics';
 interface ListingFeatureProps {
     icon: JSX.Element;
     label: string;
@@ -113,7 +114,6 @@ const ListingDetails = () => {
         }
         return state.listings.listings[listingId];
     });
-    console.log('debug::listingData::', listingData);
 
     const user = useSelector((state: RootState) => {
         return state.users.user
@@ -125,8 +125,18 @@ const ListingDetails = () => {
         e?.preventDefault();
         e?.stopPropagation();
         if (!user) {
+            trackEvent('ui_event', {
+                action: 'clicked',
+                subject: 'sendHostMessageButton',
+                extra: 'unregistered'
+            });
             setRegistrationFormOpen(true);
         } else {
+            trackEvent('ui_event', {
+                action: 'clicked',
+                subject: 'sendHostMessageButton',
+                extra: 'registration'
+            });
             dispatch(sendListingMessage({
                 fromUserId: user.id,
                 message,

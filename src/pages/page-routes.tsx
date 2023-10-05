@@ -14,7 +14,6 @@ const PageRoutes = () => {
     const ref = useRef<string | null>(null);
 
     useEffect(() => {
-        console.log('debug::ref.current::', ref.current);
         if (ref.current !== location.pathname) {
             ref.current = location.pathname;
 

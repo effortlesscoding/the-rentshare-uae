@@ -69,7 +69,6 @@ export const listingsSlice = createSlice({
     extraReducers: (builder) => {
       // Add reducers for additional action types here, and handle loading state as needed
       builder.addCase(searchListingsByPlaceId.pending, (state, action) => {
-        console.log('debug::searchListingsByPlaceId::action::', action);
         // Add a listing to the state array
         state.state = 'loading';
         state.searchPlaceName = action.meta.arg.placeName;
@@ -95,7 +94,6 @@ export const listingsSlice = createSlice({
         state.listings = {};
       });
       builder.addCase(getListingByListingId.pending, (state, action) => {
-        console.log('debug::getListingById::', action);
         state.listings = {
           ...state.listings,
           [action.meta.arg.listingId]: {
@@ -103,7 +101,6 @@ export const listingsSlice = createSlice({
             state: 'loading',
           },
         };
-        console.log('debug::state.listings::', state.listings, action.payload);
       });
       builder.addCase(getListingByListingId.fulfilled, (state, action) => {
         // Add a listing to the state array
@@ -114,7 +111,6 @@ export const listingsSlice = createSlice({
             state: 'done',
           },
         };
-        console.log('debug::state.listings::', state.listings, action.payload);
       });
       builder.addCase(getListingByListingId.rejected, (state, action) => {
         // Add a listing to the state array
@@ -125,7 +121,6 @@ export const listingsSlice = createSlice({
             state: 'error',
           },
         };
-        console.log('debug::state.listings::', state.listings, action.payload);
       });
     },
   });

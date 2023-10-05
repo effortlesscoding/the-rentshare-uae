@@ -61,7 +61,6 @@ const AutocompleteGmaps = ({
               'sublocality', // ex.: Business Bay
             ]
         }, (predictions, status) => {
-            console.log('debug::predictions::', predictions, status);
             if (!predictions || status === 'ZERO_RESULTS') {
               setOptions([]);
             } else {
@@ -74,12 +73,10 @@ const AutocompleteGmaps = ({
         if (!isAutocompleteOption(val)) {
             return;
         }
-        console.log('debug::handleOnChange::', e, val);
         setSelectedOption(val);
         onOptionSelected(val);
     }, [onOptionSelected])
 
-    console.log('debug::suggestions:', options);
 
     return (
         <Autocomplete
